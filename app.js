@@ -72,7 +72,7 @@ app.put("/players/:playerId/", async (request, response) => {
 app.delete("/players/:playerId/", async (request, response) => {
   const { playerId } = request.params;
   const deleteListQuery = `
-    delete * from cricket_team
+    delete  from cricket_team
     where player_id = ${playerId}
     ;`;
   const playersList = await db.run(deleteListQuery);
