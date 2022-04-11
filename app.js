@@ -27,12 +27,17 @@ iniatializingDBandDriver();
 //get api to get all players list
 app.get("/players/", async (request, response) => {
   const playersListQuery = `
-    select player_name from cricket_team
+    select * from cricket_team
     ;`;
   const playersList = await db.all(playersListQuery);
   let x = [];
   for (let item of playersList) {
-    x.push(item.player_name);
+    let x1 = {};
+    x1["playerId"] = item.player_id;
+    x1["playerName"] = item.player_name;
+    x1["jerseyNumber"] = item.jersey_number;
+    x1["role"] = item.role;
+    x.push(x1);
   }
   response.send(x);
 });
@@ -60,10 +65,15 @@ app.get("/players/:playerId/", async (request, response) => {
     select * from cricket_team
     where player_id = ${playerId}
     ;`;
-  const playerDetails = await db.get(playerDetailsQuery);
-  response.send(playerDetails);
-  console.log(playerId);
-  console.log(playerDetails);
+  const playerDetails = await db.all(playerDetailsQuery);
+  let x2 = {};
+  for (let i of playerDetails) {
+    x2["playerId"] = i.player_id;
+    x2["playerName"] = i.player_name;
+    x2["jerseyNumber"] = i.jersey_number;
+    x2["role"] = i.role;
+  }
+  response.send(x2);
 });
 
 app.put("/players/:playerId/", async (request, response) => {
