@@ -27,31 +27,43 @@ iniatializingDBandDriver();
 //get api to get all players list
 app.get("/players/", async (request, response) => {
   const playersListQuery = `
-    select * from cricket_team
+    select player_name from cricket_team
     ;`;
   const playersList = await db.all(playersListQuery);
-  response.send(playersList);
+  let x = [];
+  for (let item of playersList) {
+    x.push(item.player_name);
+  }
+  response.send(x);
 });
 
-app.post("/players/", async (request, response) => {
-  const playerDetails = request.body;
-  const { playerName, jerseyNumber, role } = playerDetails;
-  const addPlayerQuery = `
-    insert into cricket_team (player_name,jersey_number,role)
-    values(${playerName},${jerseyNumber},${role});`;
+//post api to get all players list
 
-  await db.run(addPlayerQuery);
+app.post("/players/", async (request, response) => {
+  const { playerName, jerseyNumber, role } = request.body;
+  const addPlayerQuery = `
+    insert into cricket_team 
+    (player_name,jersey_number,role)
+    values 
+         ("${playerName}",
+            ${jerseyNumber},
+            "${role}");`;
+  let dbresponse = await db.run(addPlayerQuery);
   response.send("Player Added to Team");
 });
 
+//get api to get all players list
+
 app.get("/players/:playerId/", async (request, response) => {
-  const { playerId } = request.params;
-  const playersListQuery = `
+  let { playerId } = request.params;
+  const playerDetailsQuery = `
     select * from cricket_team
     where player_id = ${playerId}
     ;`;
-  const playersList = await db.all(playersListQuery);
-  response.send(playersList);
+  const playerDetails = await db.get(playerDetailsQuery);
+  response.send(playerDetails);
+  console.log(playerId);
+  console.log(playerDetails);
 });
 
 app.put("/players/:playerId/", async (request, response) => {
@@ -60,9 +72,9 @@ app.put("/players/:playerId/", async (request, response) => {
   const { playerName, jerseyNumber, role } = playerDetails;
   const updatePlayerQuery = `
     update cricket_team set
-     (player_name =${playerName},
+     player_name ="${playerName}",
         jersey_number= ${jerseyNumber},
-        role=${role})
+        role="${role}"
     where player_id = ${playerId} ;`;
 
   await db.run(updatePlayerQuery);
